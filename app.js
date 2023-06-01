@@ -84,7 +84,7 @@ app.set("view engine", "ejs");
 app.get("/", async (request, response) => {
     response.render("index", {
         title: "Sports-Scheduler",
-        "csrfToken": request.csrfToken(), //prettier-ignore
+        "csrfToken": request.csrfToken(),
     });
 });
 
@@ -98,7 +98,7 @@ app.get("/signupPage", (request, response) => {
 app.get("/loginPage", (request, response) => {
     response.render("loginPage", {
         title: "Login",
-        "csrfToken": request.csrfToken(), //prettier-ignore
+        "csrfToken": request.csrfToken(),
     });
 });
 
@@ -119,9 +119,7 @@ app.post("/users", async (request, response) => {
             email: request.body.email,
         },
     });
-    console.log("====================================");
     console.log(existingUser);
-    console.log("====================================");
     try {
         const user = await User.create({
             firstName: request.body.firstName,
@@ -138,13 +136,80 @@ app.post("/users", async (request, response) => {
     } catch (error) {
         return response.send("Already exist");
     }
-
-    // return response.send("This email address is already registered with us");
 });
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use(express.static(path.join(__dirname, "images")));
+app.post(
+    "/session",
+    passport.authenticate("local", {
+        failureRedirect: "/loginPage",
+        failureFlash: true,
+    }),
+    async (request, response) => {
+        console.log(request.user);
+        if (
+            request.body.email === "adminhari@gmail.com" &&
+            request.body.password === "admin9843"
+        ) {
+            return response.redirect("/admin");
+        }
+        return response.redirect(`/userHomePage/n`);
+    }
+);
+app.get(
+    "/userHomePage/n",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const getUserName = await User.findOne({
+            where: {
+                id: request.user.id,
+            },
+        });
+        console.log(request.user.id);
+        console.log(getUserName.firstName);
+        const sportsItems = await Sports.findAll();
+        if (request.accepts("html")) {
+            response.render("userHomePage", {
+                sportsItems: sportsItems,
+                csrfToken: request.csrfToken(),
+                getUserName,
+            });
+        }
+    }
+);
+
+app.get(
+    "/admin",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const getUserName = await User.findOne({
+            where: {
+                id: request.user.id,
+            },
+        });
+        const sportsItems = await Sports.findAll();
+        const sportsItemsUser = await Sports.findOne();
+        if (request.accepts("html")) {
+            response.render("adminHomePage", {
+                sportsItems: sportsItems,
+                "csrfToken": request.csrfToken(),
+                user: sportsItemsUser,
+                getUserName,
+            });
+        }
+    }
+);
+
+app.get(
+    "/sportsCreation",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        return response.render("sportsCreation", {
+            "csrfToken": request.csrfToken(),
+        });
+    }
+);
 
 app.get(
     "/viewReport",
@@ -153,9 +218,7 @@ app.get(
         const countOfSports = await Sports.count();
         const getSports = await Sports.findAll();
         const getSessions = await sessions.findAll();
-        console.log("====================================");
         console.log(countOfSports);
-        console.log("====================================");
         return response.render("viewReport", {
             "csrfToken": request.csrfToken(), //prettier-ignore
             countOfSports,
@@ -164,6 +227,42 @@ app.get(
         });
     }
 );
+
+app.post("/newsport", async (request, response) => {
+    const inputFieldNewSport = request.body.Sports_Name;
+    const existingSport = await Sports.findOne({
+        where: { Sports_Name: inputFieldNewSport },
+    });
+    if (existingSport) {
+        response.send("Already Exist in the database");
+    } else {
+        try {
+            const inputData = await Sports.create({
+                Sports_Name: inputFieldNewSport,
+            });
+            console.log(inputData);
+            return response.redirect("/admin");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+});
+
+app.get("/newsport", async (request, response) => {
+    const getSingleSport = await Sports.findOne({
+        where: {
+            Sports_Name: "Check",
+        },
+    });
+    try {
+        return response.render("sportDetailPage", {
+            getSingleSport,
+            name: getSingleSport.Sports_Name,
+        });
+    } catch (error) {
+        console.log(error);
+    }
+});
 
 app.get(
     "/join/n/:sportname/:sessionId",
@@ -429,12 +528,6 @@ app.get(
                 },
             }
         );
-        // console.log("====================================");
-        // console.log(`Count of Players: ${countOfPlayers}`);
-        // console.log("====================================");
-        // console.log("====================================");
-        // console.log(totalPlayers);
-        // console.log("====================================");
         return response.redirect(
             `/Sports/${nameofSport}/sessionDetail/${sessionId}`
         );
@@ -473,12 +566,6 @@ app.get(
                 },
             }
         );
-        // console.log("====================================");
-        // console.log(`Count of Players: ${countOfPlayers}`);
-        // console.log("====================================");
-        // console.log("====================================");
-        // console.log(totalPlayers);
-        // console.log("====================================");
         return response.redirect(
             `/Sports/${nameofSport}/sessionDetail/n/${sessionId}`
         );
@@ -567,11 +654,9 @@ app.get(
             },
         });
         const getDate = new Date().toISOString();
-        console.log("====================================");
         console.log(request.user.id);
-        console.log("====================================");
         response.render("sessionDetailPage", {
-            "csrfToken": request.csrfToken(), //prettier-ignore
+            "csrfToken": request.csrfToken(),
             sessionSportName,
             sessionSportId,
             getSessionDetail,
@@ -626,11 +711,9 @@ app.get(
                 playerAccessId: UserId,
             },
         });
-        console.log("====================================");
         console.log(getUserName.firstName);
-        console.log("====================================");
         response.render("usersessionDetailPage", {
-            "csrfToken": request.csrfToken(), //prettier-ignore
+            "csrfToken": request.csrfToken(),
             sessionSportName,
             sessionSportId,
             getSessionDetail,
@@ -659,9 +742,7 @@ app.get(
         const idSport = await Sports.findByPk(request.params.id);
         const sportsItems = await Sports.findAll();
         try {
-            console.log("====================================");
             console.log(idSport.Sports_Name);
-            console.log("====================================");
             await sessions.destroy({
                 where: {
                     sportname: idSport.Sports_Name,
@@ -692,19 +773,11 @@ app.get(
             },
         });
         const UserId = request.user.id;
-        console.log("====================================");
         console.log(request.user.id);
-        console.log("====================================");
-        // const getSessionsTime = await SessionsV3.findOne({
-        //   where: {
-        //     sportname2: SportsName,
-        //   },
-        // });
-
         console.log(getSportName);
         return response.render("sportDetailPage", {
             name: SportsName,
-            "csrfToken": request.csrfToken(), //prettier-ignore
+            "csrfToken": request.csrfToken(),
             getSportName,
             getDate,
             UserId,
@@ -726,19 +799,11 @@ app.get(
                 id: request.user.id,
             },
         });
-        console.log("====================================");
         console.log(request.user.id);
-        console.log("====================================");
-        // const getSessionsTime = await SessionsV3.findOne({
-        //   where: {
-        //     sportname2: SportsName,
-        //   },
-        // });
-
         console.log(getSportName);
         return response.render("usersportDetailPage", {
             name: SportsName,
-            "csrfToken": request.csrfToken(), //prettier-ignore
+            "csrfToken": request.csrfToken(),
             getSportName,
             getUserName,
             getDate,
@@ -770,9 +835,7 @@ app.post("/Sports/:name", async (request, response) => {
             sportname: name,
         });
         console.log(inputData);
-        console.log("====================================");
         console.log(PlayersName);
-        console.log("====================================");
         return response.redirect(`/Sports/${name}`);
     } catch (error) {
         console.log(error);
@@ -802,9 +865,6 @@ app.post("/Sports/n/:name", async (request, response) => {
             sportname: name,
         });
         console.log(inputData);
-        console.log("====================================");
-        console.log(PlayersName);
-        console.log("====================================");
         return response.redirect(`/Sports/n/${name}`);
     } catch (error) {
         console.log(error);
@@ -814,118 +874,8 @@ app.post("/Sports/n/:name", async (request, response) => {
 app.get("/Sports/:name/NewSession", async (request, response) => {
     return response.render("sessionCreation", {
         title: request.params.name,
-        "csrfToken": request.csrfToken(), //prettier-ignore
+        "csrfToken": request.csrfToken(),
     });
-});
-
-app.post(
-    "/session",
-    passport.authenticate("local", {
-        failureRedirect: "/loginPage",
-        failureFlash: true,
-    }),
-    async (request, response) => {
-        console.log(request.user);
-        if (
-            request.body.email === "adminhari@gmail.com" &&
-            request.body.password === "admin9843"
-        ) {
-            return response.redirect("/admin");
-        }
-        return response.redirect(`/userHomePage/n`);
-    }
-);
-
-app.get(
-    "/userHomePage/n",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const getUserName = await User.findOne({
-            where: {
-                id: request.user.id,
-            },
-        });
-        console.log("====================================");
-        console.log(request.user.id);
-        console.log(getUserName.firstName);
-        console.log("====================================");
-        const sportsItems = await Sports.findAll();
-        if (request.accepts("html")) {
-            response.render("userHomePage", {
-                sportsItems: sportsItems,
-                csrfToken: request.csrfToken(),
-                getUserName, //prettier-ignore
-            });
-        }
-    }
-);
-
-app.get(
-    "/admin",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const getUserName = await User.findOne({
-            where: {
-                id: request.user.id,
-            },
-        });
-        const sportsItems = await Sports.findAll();
-        const sportsItemsUser = await Sports.findOne();
-        if (request.accepts("html")) {
-            response.render("adminHomePage", {
-                sportsItems: sportsItems,
-                "csrfToken": request.csrfToken(), //prettier-ignore
-                user: sportsItemsUser,
-                getUserName,
-            });
-        }
-    }
-);
-
-app.get(
-    "/sportsCreation",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        return response.render("sportsCreation", {
-            "csrfToken": request.csrfToken(), //prettier-ignore
-        });
-    }
-);
-
-app.post("/newsport", async (request, response) => {
-    const inputFieldNewSport = request.body.Sports_Name;
-    const existingSport = await Sports.findOne({
-        where: { Sports_Name: inputFieldNewSport },
-    });
-    if (existingSport) {
-        response.send("Already Exist in the database");
-    } else {
-        try {
-            const inputData = await Sports.create({
-                Sports_Name: inputFieldNewSport,
-            });
-            console.log(inputData);
-            return response.redirect("/admin");
-        } catch (error) {
-            console.log(error);
-        }
-    }
-});
-
-app.get("/newsport", async (request, response) => {
-    const getSingleSport = await Sports.findOne({
-        where: {
-            Sports_Name: "Check",
-        },
-    });
-    try {
-        return response.render("sportDetailPage", {
-            getSingleSport,
-            name: getSingleSport.Sports_Name,
-        });
-    } catch (error) {
-        console.log(error);
-    }
 });
 
 module.exports = app;
