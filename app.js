@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { User, Sports, sessions, players } = require("./models");
+const { Todo, User, Sports, sessions, players } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 const passport = require("passport");
@@ -30,34 +30,39 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use((request, response, next) => {
+app.use(function (request, response, next) {
     response.locals.messages = request.flash();
     next();
 });
 
-passport.use(new LocalStrategy({
-    usernameField: "email",
-    passwordField: "password",
-}, (username, password, done) => {
-    User.findOne({
-        where: {
-            email: username,
+passport.use(
+    new LocalStrategy(
+        {
+            usernameField: "email",
+            passwordField: "password",
         },
-    })
-        .then(async (user) => {
-            const result = await bcrypt.compare(password, user.password);
-            if (result) {
-                return done(null, user);
-            } else {
-                return done(null, false, { message: "Invalid Password" });
-            }
-        })
-        .catch((error) => {
-            return done(null, false, {
-                message: "Account doesn't exist for this mail id",
-            });
-        });
-}));
+        (username, password, done) => {
+            User.findOne({
+                where: {
+                    email: username,
+                },
+            })
+                .then(async (user) => {
+                    const result = await bcrypt.compare(password, user.password);
+                    if (result) {
+                        return done(null, user);
+                    } else {
+                        return done(null, false, { message: "Invalid Password" });
+                    }
+                })
+                .catch((error) => {
+                    return done(null, false, {
+                        message: "Account doesn't exist for this mail id",
+                    });
+                });
+        }
+    )
+);
 
 passport.serializeUser((user, done) => {
     console.log("Serializing user in session", user.id);
@@ -79,7 +84,7 @@ app.set("view engine", "ejs");
 app.get("/", async (request, response) => {
     response.render("index", {
         title: "Sports-Scheduler",
-        "csrfToken": request.csrfToken(),
+        "csrfToken": request.csrfToken(), //prettier-ignore
     });
 });
 
@@ -93,7 +98,7 @@ app.get("/signupPage", (request, response) => {
 app.get("/loginPage", (request, response) => {
     response.render("loginPage", {
         title: "Login",
-        "csrfToken": request.csrfToken(),
+        "csrfToken": request.csrfToken(), //prettier-ignore
     });
 });
 
@@ -114,7 +119,9 @@ app.post("/users", async (request, response) => {
             email: request.body.email,
         },
     });
+    console.log("====================================");
     console.log(existingUser);
+    console.log("====================================");
     try {
         const user = await User.create({
             firstName: request.body.firstName,
@@ -132,133 +139,12 @@ app.post("/users", async (request, response) => {
         return response.send("Already exist");
     }
 
-
+    // return response.send("This email address is already registered with us");
 });
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.post(
-    "/session",
-    passport.authenticate("local", {
-        failureRedirect: "/loginPage",
-        failureFlash: true,
-    }),
-    async (request, response) => {
-        console.log(request.user);
-        if (
-            request.body.email === "administrator@gmail.com" &&
-            request.body.password === "admin9876"
-        ) {
-            return response.redirect("/admin");
-        }
-        return response.redirect(`/userHomePage/n`);
-    }
-);
-
-app.get(
-    "/admin",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const getUserName = await User.findOne({
-            where: {
-                id: request.user.id,
-            },
-        });
-        const sportsItems = await Sports.findAll();
-        const sportsItemsUser = await Sports.findOne();
-        if (request.accepts("html")) {
-            response.render("adminHomePage", {
-                sportsItems: sportsItems,
-                "csrfToken": request.csrfToken(),
-                user: sportsItemsUser,
-                getUserName,
-            });
-        }
-    }
-);
-
-app.get(
-    "/userHomePage/n",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const getUserName = await User.findOne({
-            where: {
-                id: request.user.id,
-            },
-        });
-        console.log(request.user.id);
-        console.log(getUserName.firstName);
-        const sportsItems = await Sports.findAll();
-        if (request.accepts("html")) {
-            response.render("userHomePage", {
-                sportsItems: sportsItems,
-                csrfToken: request.csrfToken(),
-                getUserName,
-            });
-        }
-    }
-);
-
-app.post("/newsport", async (request, response) => {
-    const inputFieldNewSport = request.body.Sports_Name;
-    const existingSport = await Sports.findOne({
-        where: { Sports_Name: inputFieldNewSport },
-    });
-    if (existingSport) {
-        response.send("Already Exist in the database");
-    } else {
-        try {
-            const inputData = await Sports.create({
-                Sports_Name: inputFieldNewSport,
-            });
-            console.log(inputData);
-            return response.redirect("/admin");
-        } catch (error) {
-            console.log(error);
-        }
-    }
-});
-
-app.get("/newsport", async (request, response) => {
-    const getSingleSport = await Sports.findOne({
-        where: {
-            Sports_Name: "Check",
-        },
-    });
-    try {
-        return response.render("sportDetailPage", {
-            getSingleSport,
-            name: getSingleSport.Sports_Name,
-        });
-    } catch (error) {
-        console.log(error);
-    }
-});
-
-app.get(
-    "/sportsCreation",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        return response.render("sportsCreation", {
-            "csrfToken": request.csrfToken(),
-        });
-    }
-);
-
-app.get(
-    "/SportDetail",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        return response.render("sportDetailPage2");
-    }
-);
-
-app.get("/Sports/:name/NewSession", async (request, response) => {
-    return response.render("sessionCreation", {
-        title: request.params.name,
-        "csrfToken": request.csrfToken(),
-    });
-});
+app.use(express.static(path.join(__dirname, "images")));
 
 app.get(
     "/viewReport",
@@ -267,108 +153,15 @@ app.get(
         const countOfSports = await Sports.count();
         const getSports = await Sports.findAll();
         const getSessions = await sessions.findAll();
+        console.log("====================================");
         console.log(countOfSports);
+        console.log("====================================");
         return response.render("viewReport", {
             "csrfToken": request.csrfToken(), //prettier-ignore
             countOfSports,
             getSports,
             getSessions,
         });
-    }
-);
-
-app.post(
-    "/updateSport",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const oldSportName = request.body.Check_Sports_Name;
-        const newSportName = request.body.Sports_Name_Update;
-        const updateSport = await Sports.update(
-            { Sports_Name: newSportName },
-            {
-                where: {
-                    Sports_Name: oldSportName,
-                },
-            }
-        );
-        const updateSessionSportName = await sessions.update(
-            { sportname: newSportName },
-            {
-                where: {
-                    sportname: oldSportName,
-                },
-            }
-        );
-        return response.redirect("/admin");
-    }
-);
-
-app.post(
-    "/Sports/:name/sessionDetail/:id",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const sportName = request.params.name;
-        const sportId = request.params.id;
-        const playerName = request.body.playerNames;
-        const create = await players.create({
-            playerNames: playerName,
-            sportmatch: sportName,
-            sessionId: sportId,
-        });
-        const updateSessionPlayerCount = await sessions.update(
-            {
-                availablePlayers: request.body.availablePlayersCount,
-            },
-            {
-                where: {
-                    id: sportId,
-                },
-            }
-        );
-        return response.redirect(`/Sports/${sportName}/sessionDetail/${sportId}`);
-    }
-);
-
-
-app.post(
-    "/updateSession",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const updateSession = await sessions.update(
-            {
-                session: request.body.session,
-                time: request.body.time,
-                Address: request.body.Address,
-                countOfPlayers: request.body.numberOfPlayers,
-            },
-            {
-                where: {
-                    id: request.body.userId,
-                },
-            }
-        );
-        return response.redirect(`/admin`);
-    }
-);
-
-app.post(
-    "/updateSession/n",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const updateSession = await sessions.update(
-            {
-                session: request.body.session,
-                time: request.body.time,
-                Address: request.body.Address,
-                countOfPlayers: request.body.numberOfPlayers,
-            },
-            {
-                where: {
-                    id: request.body.userId,
-                },
-            }
-        );
-        return response.redirect(`/userHomePage/n`);
     }
 );
 
@@ -381,7 +174,9 @@ app.get(
                 id: request.user.id,
             },
         });
+        console.log("====================================");
         console.log(getPlayerName.firstName);
+        console.log("====================================");
         const totalPlayers = await sessions.findOne({
             where: {
                 id: request.params.sessionId,
@@ -429,32 +224,6 @@ app.get(
     }
 );
 
-app.post(
-    "/Sports/:name/sessionDetail/:id",
-    connectEnsureLogin.ensureLoggedIn(),
-    async (request, response) => {
-        const sportName = request.params.name;
-        const sportId = request.params.id;
-        const playerName = request.body.playerNames;
-        const create = await players.create({
-            playerNames: playerName,
-            sportmatch: sportName,
-            sessionId: sportId,
-        });
-        const updateSessionPlayerCount = await sessions.update(
-            {
-                availablePlayers: request.body.availablePlayersCount,
-            },
-            {
-                where: {
-                    id: sportId,
-                },
-            }
-        );
-        return response.redirect(`/Sports/${sportName}/sessionDetail/${sportId}`);
-    }
-);
-
 app.get(
     "/join/:sportname/:sessionId",
     connectEnsureLogin.ensureLoggedIn(),
@@ -464,7 +233,9 @@ app.get(
                 id: request.user.id,
             },
         });
+        console.log("====================================");
         console.log(getPlayerName.firstName);
+        console.log("====================================");
         const totalPlayers = await sessions.findOne({
             where: {
                 id: request.params.sessionId,
@@ -509,6 +280,74 @@ app.get(
         return response.redirect(
             `/Sports/${request.params.sportname}/SessionDetail/${request.params.sessionId}`
         );
+    }
+);
+
+app.post(
+    "/updateSession",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const updateSession = await sessions.update(
+            {
+                session: request.body.session,
+                time: request.body.time,
+                Address: request.body.Address,
+                countOfPlayers: request.body.numberOfPlayers,
+            },
+            {
+                where: {
+                    id: request.body.userId,
+                },
+            }
+        );
+        return response.redirect(`/admin`);
+    }
+);
+
+app.post(
+    "/updateSession/n",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const updateSession = await sessions.update(
+            {
+                session: request.body.session,
+                time: request.body.time,
+                Address: request.body.Address,
+                countOfPlayers: request.body.numberOfPlayers,
+            },
+            {
+                where: {
+                    id: request.body.userId,
+                },
+            }
+        );
+        return response.redirect(`/userHomePage/n`);
+    }
+);
+
+app.post(
+    "/updateSport",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const oldSportName = request.body.Check_Sports_Name;
+        const newSportName = request.body.Sports_Name_Update;
+        const updateSport = await Sports.update(
+            { Sports_Name: newSportName },
+            {
+                where: {
+                    Sports_Name: oldSportName,
+                },
+            }
+        );
+        const updateSessionSportName = await sessions.update(
+            { sportname: newSportName },
+            {
+                where: {
+                    sportname: oldSportName,
+                },
+            }
+        );
+        return response.redirect("/admin");
     }
 );
 
@@ -590,6 +429,12 @@ app.get(
                 },
             }
         );
+        // console.log("====================================");
+        // console.log(`Count of Players: ${countOfPlayers}`);
+        // console.log("====================================");
+        // console.log("====================================");
+        // console.log(totalPlayers);
+        // console.log("====================================");
         return response.redirect(
             `/Sports/${nameofSport}/sessionDetail/${sessionId}`
         );
@@ -628,9 +473,67 @@ app.get(
                 },
             }
         );
+        // console.log("====================================");
+        // console.log(`Count of Players: ${countOfPlayers}`);
+        // console.log("====================================");
+        // console.log("====================================");
+        // console.log(totalPlayers);
+        // console.log("====================================");
         return response.redirect(
             `/Sports/${nameofSport}/sessionDetail/n/${sessionId}`
         );
+    }
+);
+
+app.post(
+    "/Sports/:name/sessionDetail/:id",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const sportName = request.params.name;
+        const sportId = request.params.id;
+        const playerName = request.body.playerNames;
+        const create = await players.create({
+            playerNames: playerName,
+            sportmatch: sportName,
+            sessionId: sportId,
+        });
+        const updateSessionPlayerCount = await sessions.update(
+            {
+                availablePlayers: request.body.availablePlayersCount,
+            },
+            {
+                where: {
+                    id: sportId,
+                },
+            }
+        );
+        return response.redirect(`/Sports/${sportName}/sessionDetail/${sportId}`);
+    }
+);
+
+app.post(
+    "/Sports/:name/sessionDetail/n/:id",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const sportName = request.params.name;
+        const sportId = request.params.id;
+        const playerName = request.body.playerNames;
+        const create = await players.create({
+            playerNames: playerName,
+            sportmatch: sportName,
+            sessionId: sportId,
+        });
+        const updateSessionPlayerCount = await sessions.update(
+            {
+                availablePlayers: request.body.availablePlayersCount,
+            },
+            {
+                where: {
+                    id: sportId,
+                },
+            }
+        );
+        return response.redirect(`/Sports/${sportName}/sessionDetail/n/${sportId}`);
     }
 );
 
@@ -664,9 +567,11 @@ app.get(
             },
         });
         const getDate = new Date().toISOString();
+        console.log("====================================");
         console.log(request.user.id);
+        console.log("====================================");
         response.render("sessionDetailPage", {
-            "csrfToken": request.csrfToken(),
+            "csrfToken": request.csrfToken(), //prettier-ignore
             sessionSportName,
             sessionSportId,
             getSessionDetail,
@@ -721,9 +626,12 @@ app.get(
                 playerAccessId: UserId,
             },
         });
+        console.log("====================================");
         console.log(getUserName.firstName);
+        console.log("====================================");
         response.render("usersessionDetailPage", {
-            "csrfToken": request.csrfToken(),
+            "csrfToken": request.csrfToken(), //prettier-ignore
+            sessionSportName,
             sessionSportId,
             getSessionDetail,
             getPlayers,
@@ -737,13 +645,23 @@ app.get(
 );
 
 app.get(
+    "/SportDetail",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        return response.render("sportDetailPage2");
+    }
+);
+
+app.get(
     `/delete/:id`,
     connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const idSport = await Sports.findByPk(request.params.id);
         const sportsItems = await Sports.findAll();
         try {
+            console.log("====================================");
             console.log(idSport.Sports_Name);
+            console.log("====================================");
             await sessions.destroy({
                 where: {
                     sportname: idSport.Sports_Name,
@@ -774,7 +692,15 @@ app.get(
             },
         });
         const UserId = request.user.id;
+        console.log("====================================");
         console.log(request.user.id);
+        console.log("====================================");
+        // const getSessionsTime = await SessionsV3.findOne({
+        //   where: {
+        //     sportname2: SportsName,
+        //   },
+        // });
+
         console.log(getSportName);
         return response.render("sportDetailPage", {
             name: SportsName,
@@ -800,11 +726,19 @@ app.get(
                 id: request.user.id,
             },
         });
+        console.log("====================================");
         console.log(request.user.id);
+        console.log("====================================");
+        // const getSessionsTime = await SessionsV3.findOne({
+        //   where: {
+        //     sportname2: SportsName,
+        //   },
+        // });
+
         console.log(getSportName);
         return response.render("usersportDetailPage", {
             name: SportsName,
-            "csrfToken": request.csrfToken(),
+            "csrfToken": request.csrfToken(), //prettier-ignore
             getSportName,
             getUserName,
             getDate,
@@ -836,7 +770,9 @@ app.post("/Sports/:name", async (request, response) => {
             sportname: name,
         });
         console.log(inputData);
+        console.log("====================================");
         console.log(PlayersName);
+        console.log("====================================");
         return response.redirect(`/Sports/${name}`);
     } catch (error) {
         console.log(error);
@@ -866,7 +802,127 @@ app.post("/Sports/n/:name", async (request, response) => {
             sportname: name,
         });
         console.log(inputData);
+        console.log("====================================");
+        console.log(PlayersName);
+        console.log("====================================");
         return response.redirect(`/Sports/n/${name}`);
+    } catch (error) {
+        console.log(error);
+    }
+});
+
+app.get("/Sports/:name/NewSession", async (request, response) => {
+    return response.render("sessionCreation", {
+        title: request.params.name,
+        "csrfToken": request.csrfToken(), //prettier-ignore
+    });
+});
+
+app.post(
+    "/session",
+    passport.authenticate("local", {
+        failureRedirect: "/loginPage",
+        failureFlash: true,
+    }),
+    async (request, response) => {
+        console.log(request.user);
+        if (
+            request.body.email === "adminhari@gmail.com" &&
+            request.body.password === "admin9843"
+        ) {
+            return response.redirect("/admin");
+        }
+        return response.redirect(`/userHomePage/n`);
+    }
+);
+
+app.get(
+    "/userHomePage/n",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const getUserName = await User.findOne({
+            where: {
+                id: request.user.id,
+            },
+        });
+        console.log("====================================");
+        console.log(request.user.id);
+        console.log(getUserName.firstName);
+        console.log("====================================");
+        const sportsItems = await Sports.findAll();
+        if (request.accepts("html")) {
+            response.render("userHomePage", {
+                sportsItems: sportsItems,
+                csrfToken: request.csrfToken(),
+                getUserName, //prettier-ignore
+            });
+        }
+    }
+);
+
+app.get(
+    "/admin",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        const getUserName = await User.findOne({
+            where: {
+                id: request.user.id,
+            },
+        });
+        const sportsItems = await Sports.findAll();
+        const sportsItemsUser = await Sports.findOne();
+        if (request.accepts("html")) {
+            response.render("adminHomePage", {
+                sportsItems: sportsItems,
+                "csrfToken": request.csrfToken(), //prettier-ignore
+                user: sportsItemsUser,
+                getUserName,
+            });
+        }
+    }
+);
+
+app.get(
+    "/sportsCreation",
+    connectEnsureLogin.ensureLoggedIn(),
+    async (request, response) => {
+        return response.render("sportsCreation", {
+            "csrfToken": request.csrfToken(), //prettier-ignore
+        });
+    }
+);
+
+app.post("/newsport", async (request, response) => {
+    const inputFieldNewSport = request.body.Sports_Name;
+    const existingSport = await Sports.findOne({
+        where: { Sports_Name: inputFieldNewSport },
+    });
+    if (existingSport) {
+        response.send("Already Exist in the database");
+    } else {
+        try {
+            const inputData = await Sports.create({
+                Sports_Name: inputFieldNewSport,
+            });
+            console.log(inputData);
+            return response.redirect("/admin");
+        } catch (error) {
+            console.log(error);
+        }
+    }
+});
+
+app.get("/newsport", async (request, response) => {
+    const getSingleSport = await Sports.findOne({
+        where: {
+            Sports_Name: "Check",
+        },
+    });
+    try {
+        return response.render("sportDetailPage", {
+            getSingleSport,
+            name: getSingleSport.Sports_Name,
+        });
     } catch (error) {
         console.log(error);
     }
