@@ -80,15 +80,15 @@ app.get("/", async (request, response) => {
     });
 });
 
-app.get("/signupPage", (request, response) => {
-    response.render("signupPage", {
+app.get("/Signup_Page", (request, response) => {
+    response.render("Signup_Page", {
         title: "Signup",
         csrfToken: request.csrfToken()
     });
 });
 
-app.get("/loginPage", (request, response) => {
-    response.render("loginPage", {
+app.get("/Login_Page", (request, response) => {
+    response.render("Login_Page", {
         title: "Login",
         "csrfToken": request.csrfToken(),
     });
@@ -123,17 +123,17 @@ app.post("/users", async (request, response) => {
             if (err) {
                 console.log(error);
             }
-            return response.redirect("/userHomePage/n");
+            return response.redirect("/User_Home_Page/n");
         });
     } catch (error) {
         console.log(error);
         request.flash("error", "Email already in use!");
-        response.redirect("/signupPage");
+        response.redirect("/Signup_Page");
     }
 });
 
 app.post("/session", passport.authenticate("local", {
-    failureRedirect: "/loginPage",
+    failureRedirect: "/Login_Page",
     failureFlash: true,
 }),
     async (request, response) => {
@@ -144,11 +144,11 @@ app.post("/session", passport.authenticate("local", {
         ) {
             return response.redirect("/admin");
         }
-        return response.redirect(`/userHomePage/n`);
+        return response.redirect(`/User_Home_Page/n`);
     }
 );
 
-app.get("/userHomePage/n", connectEnsureLogin.ensureLoggedIn(),
+app.get("/User_Home_Page/n", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const getUserName = await User.findOne({
             where: {
@@ -159,7 +159,7 @@ app.get("/userHomePage/n", connectEnsureLogin.ensureLoggedIn(),
         console.log(getUserName.firstName);
         const sportsItems = await Sports.findAll();
         if (request.accepts("html")) {
-            response.render("userHomePage", {
+            response.render("User_Home_Page", {
                 sportsItems: sportsItems,
                 csrfToken: request.csrfToken(),
                 getUserName,
@@ -178,7 +178,7 @@ app.get("/admin", connectEnsureLogin.ensureLoggedIn(),
         const sportsItems = await Sports.findAll();
         const sportsItemsUser = await Sports.findOne();
         if (request.accepts("html")) {
-            response.render("adminHomePage", {
+            response.render("Admin_Home_Page", {
                 sportsItems: sportsItems,
                 "csrfToken": request.csrfToken(),
                 user: sportsItemsUser,
@@ -196,13 +196,13 @@ app.get("/sportsCreation", connectEnsureLogin.ensureLoggedIn(),
     }
 );
 
-app.get("/viewReport", connectEnsureLogin.ensureLoggedIn(),
+app.get("/View_Report", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const countOfSports = await Sports.count();
         const getSports = await Sports.findAll();
         const getSessions = await sessions.findAll();
         console.log(countOfSports);
-        return response.render("viewReport", {
+        return response.render("View_Report", {
             "csrfToken": request.csrfToken(),
             countOfSports,
             getSports,
@@ -238,7 +238,7 @@ app.get("/newsport", async (request, response) => {
         },
     });
     try {
-        return response.render("sportDetailPage", {
+        return response.render("Sport_Detail_Page", {
             getSingleSport,
             name: getSingleSport.Sports_Name,
         });
@@ -391,7 +391,7 @@ app.post("/updateSession/n", connectEnsureLogin.ensureLoggedIn(),
                 },
             }
         );
-        return response.redirect(`/userHomePage/n`);
+        return response.redirect(`/User_Home_Page/n`);
     }
 );
 
@@ -617,7 +617,7 @@ app.get("/Sports/:name/sessionDetail/:id", connectEnsureLogin.ensureLoggedIn(),
         });
         const getDate = new Date().toISOString();
         console.log(request.user.id);
-        response.render("sessionDetailPage", {
+        response.render("Session_Detail_Page", {
             "csrfToken": request.csrfToken(),
             sessionSportName,
             sessionSportId,
@@ -672,7 +672,7 @@ app.get("/Sports/:name/sessionDetail/n/:id", connectEnsureLogin.ensureLoggedIn()
             },
         });
         console.log(getUserName.firstName);
-        response.render("usersessionDetailPage", {
+        response.render("Usersession_Detail_Page", {
             "csrfToken": request.csrfToken(),
             sessionSportName,
             sessionSportId,
@@ -729,7 +729,7 @@ app.get("/Sports/:name", connectEnsureLogin.ensureLoggedIn(),
         const UserId = request.user.id;
         console.log(request.user.id);
         console.log(getSportName);
-        return response.render("sportDetailPage", {
+        return response.render("Sport_Detail_Page", {
             name: SportsName,
             "csrfToken": request.csrfToken(),
             getSportName,
@@ -753,7 +753,7 @@ app.get("/Sports/n/:name", connectEnsureLogin.ensureLoggedIn(),
         });
         console.log(request.user.id);
         console.log(getSportName);
-        return response.render("usersportDetailPage", {
+        return response.render("Usersport_Detail_Page", {
             name: SportsName,
             "csrfToken": request.csrfToken(),
             getSportName,
