@@ -133,7 +133,7 @@ app.post("/users", async (request, response) => {
             if (err) {
                 console.log(error);
             }
-            return response.redirect(`/userHomePage/n`);
+            return response.redirect("/userHomePage/n");
         });
     } catch (error) {
         return response.send("Already exist");
