@@ -4,6 +4,8 @@ const { Todo, User, Sports, sessions, players } = require("./models");
 const bodyParser = require("body-parser");
 const path = require("path");
 const passport = require("passport");
+app.use(express.static(path.join(__dirname, "public")));
+app.set("view engine", "ejs");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
 const LocalStrategy = require("passport-local");
@@ -30,39 +32,32 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(function (request, response, next) {
+app.use((request, response, next) => {
     response.locals.messages = request.flash();
     next();
 });
 
-passport.use(
-    new LocalStrategy(
-        {
-            usernameField: "email",
-            passwordField: "password",
+passport.use(new LocalStrategy({
+    usernameField: "email",
+    passwordField: "password",
+}, (username, password, done) => {
+    User.findOne({
+        where: {
+            email: username,
         },
-        (username, password, done) => {
-            User.findOne({
-                where: {
-                    email: username,
-                },
-            })
-                .then(async (user) => {
-                    const result = await bcrypt.compare(password, user.password);
-                    if (result) {
-                        return done(null, user);
-                    } else {
-                        return done(null, false, { message: "Invalid Password" });
-                    }
-                })
-                .catch((error) => {
-                    return done(null, false, {
-                        message: "Account doesn't exist for this mail id",
-                    });
-                });
+    }).then(async (user) => {
+        const result = await bcrypt.compare(password, user.password);
+        if (result) {
+            return done(null, user);
+        } else {
+            return done(null, false, { message: "Invalid Password" });
         }
-    )
-);
+    }).catch((error) => {
+        return done(null, false, {
+            message: "Account doesn't exist for this mail id",
+        });
+    });
+}));
 
 passport.serializeUser((user, done) => {
     console.log("Serializing user in session", user.id);
@@ -73,13 +68,10 @@ passport.deserializeUser((id, done) => {
     User.findByPk(id)
         .then((user) => {
             done(null, user);
-        })
-        .catch((error) => {
+        }).catch((error) => {
             done(error, null);
         });
 });
-
-app.set("view engine", "ejs");
 
 app.get("/", async (request, response) => {
     response.render("index", {
@@ -140,28 +132,23 @@ app.post("/users", async (request, response) => {
     }
 });
 
-app.use(express.static(path.join(__dirname, "public")));
-
-app.post(
-    "/session",
-    passport.authenticate("local", {
-        failureRedirect: "/loginPage",
-        failureFlash: true,
-    }),
+app.post("/session", passport.authenticate("local", {
+    failureRedirect: "/loginPage",
+    failureFlash: true,
+}),
     async (request, response) => {
         console.log(request.user);
         if (
-            request.body.email === "adminhari@gmail.com" &&
-            request.body.password === "admin9843"
+            request.body.email === "administrator@gmail.com" &&
+            request.body.password === "admin9876"
         ) {
             return response.redirect("/admin");
         }
         return response.redirect(`/userHomePage/n`);
     }
 );
-app.get(
-    "/userHomePage/n",
-    connectEnsureLogin.ensureLoggedIn(),
+
+app.get("/userHomePage/n", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const getUserName = await User.findOne({
             where: {
@@ -181,9 +168,7 @@ app.get(
     }
 );
 
-app.get(
-    "/admin",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/admin", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const getUserName = await User.findOne({
             where: {
@@ -203,9 +188,7 @@ app.get(
     }
 );
 
-app.get(
-    "/sportsCreation",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/sportsCreation", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         return response.render("sportsCreation", {
             "csrfToken": request.csrfToken(),
@@ -213,16 +196,14 @@ app.get(
     }
 );
 
-app.get(
-    "/viewReport",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/viewReport", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const countOfSports = await Sports.count();
         const getSports = await Sports.findAll();
         const getSessions = await sessions.findAll();
         console.log(countOfSports);
         return response.render("viewReport", {
-            "csrfToken": request.csrfToken(), //prettier-ignore
+            "csrfToken": request.csrfToken(),
             countOfSports,
             getSports,
             getSessions,
@@ -266,18 +247,14 @@ app.get("/newsport", async (request, response) => {
     }
 });
 
-app.get(
-    "/join/n/:sportname/:sessionId",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/join/n/:sportname/:sessionId", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const getPlayerName = await User.findOne({
             where: {
                 id: request.user.id,
             },
         });
-        console.log("====================================");
         console.log(getPlayerName.firstName);
-        console.log("====================================");
         const totalPlayers = await sessions.findOne({
             where: {
                 id: request.params.sessionId,
@@ -325,18 +302,14 @@ app.get(
     }
 );
 
-app.get(
-    "/join/:sportname/:sessionId",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/join/:sportname/:sessionId", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const getPlayerName = await User.findOne({
             where: {
                 id: request.user.id,
             },
         });
-        console.log("====================================");
         console.log(getPlayerName.firstName);
-        console.log("====================================");
         const totalPlayers = await sessions.findOne({
             where: {
                 id: request.params.sessionId,
@@ -384,9 +357,7 @@ app.get(
     }
 );
 
-app.post(
-    "/updateSession",
-    connectEnsureLogin.ensureLoggedIn(),
+app.post("/updateSession", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const updateSession = await sessions.update(
             {
@@ -405,9 +376,7 @@ app.post(
     }
 );
 
-app.post(
-    "/updateSession/n",
-    connectEnsureLogin.ensureLoggedIn(),
+app.post("/updateSession/n", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const updateSession = await sessions.update(
             {
@@ -426,9 +395,7 @@ app.post(
     }
 );
 
-app.post(
-    "/updateSport",
-    connectEnsureLogin.ensureLoggedIn(),
+app.post("/updateSport", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const oldSportName = request.body.Check_Sports_Name;
         const newSportName = request.body.Sports_Name_Update;
@@ -452,9 +419,14 @@ app.post(
     }
 );
 
-app.get(
-    "/Sports/:name/deleteSession/:id",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name/NewSession", async (request, response) => {
+    return response.render("sessionCreation", {
+        title: request.params.name,
+        "csrfToken": request.csrfToken(),
+    });
+});
+
+app.get("/Sports/:name/deleteSession/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const deleteSessionId = request.params.id;
         const nameofSport = request.params.name;
@@ -475,9 +447,7 @@ app.get(
     }
 );
 
-app.get(
-    "/Sports/:name/deleteSession/n/:id",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name/deleteSession/n/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const deleteSessionId = request.params.id;
         const nameofSport = request.params.name;
@@ -498,9 +468,7 @@ app.get(
     }
 );
 
-app.get(
-    "/Sports/:name/sessionDetail/delete/:id/sessionid/:sessionid",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name/sessionDetail/delete/:id/sessionid/:sessionid", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const deletePlayerId = request.params.id;
         const nameofSport = request.params.name;
@@ -536,9 +504,7 @@ app.get(
     }
 );
 
-app.get(
-    "/Sports/:name/sessionDetail/delete/:id/sessionid/n/:sessionid",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name/sessionDetail/delete/:id/sessionid/n/:sessionid", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const deletePlayerId = request.params.id;
         const nameofSport = request.params.name;
@@ -574,9 +540,7 @@ app.get(
     }
 );
 
-app.post(
-    "/Sports/:name/sessionDetail/:id",
-    connectEnsureLogin.ensureLoggedIn(),
+app.post("/Sports/:name/sessionDetail/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const sportName = request.params.name;
         const sportId = request.params.id;
@@ -600,9 +564,7 @@ app.post(
     }
 );
 
-app.post(
-    "/Sports/:name/sessionDetail/n/:id",
-    connectEnsureLogin.ensureLoggedIn(),
+app.post("/Sports/:name/sessionDetail/n/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const sportName = request.params.name;
         const sportId = request.params.id;
@@ -626,9 +588,7 @@ app.post(
     }
 );
 
-app.get(
-    "/Sports/:name/sessionDetail/:id",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name/sessionDetail/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const userId = request.user.id;
         const sessionSportName = request.params.name;
@@ -671,9 +631,7 @@ app.get(
     }
 );
 
-app.get(
-    "/Sports/:name/sessionDetail/n/:id",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name/sessionDetail/n/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const sessionSportName = request.params.name;
         const sessionSportId = request.params.id;
@@ -729,17 +687,13 @@ app.get(
     }
 );
 
-app.get(
-    "/SportDetail",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/SportDetail", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         return response.render("sportDetailPage2");
     }
 );
 
-app.get(
-    `/delete/:id`,
-    connectEnsureLogin.ensureLoggedIn(),
+app.get(`/delete/:id`, connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const idSport = await Sports.findByPk(request.params.id);
         const sportsItems = await Sports.findAll();
@@ -762,9 +716,7 @@ app.get(
     }
 );
 
-app.get(
-    "/Sports/:name",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/:name", connectEnsureLogin.ensureLoggedIn(),
     async function (request, response) {
         const SportsName = request.params.name;
         const getSportName = await sessions.getSport(SportsName);
@@ -788,9 +740,7 @@ app.get(
     }
 );
 
-app.get(
-    "/Sports/n/:name",
-    connectEnsureLogin.ensureLoggedIn(),
+app.get("/Sports/n/:name", connectEnsureLogin.ensureLoggedIn(),
     async function (request, response) {
         const SportsName = request.params.name;
         const getSportName = await sessions.getSport(SportsName);
@@ -873,11 +823,5 @@ app.post("/Sports/n/:name", async (request, response) => {
     }
 });
 
-app.get("/Sports/:name/NewSession", async (request, response) => {
-    return response.render("sessionCreation", {
-        title: request.params.name,
-        "csrfToken": request.csrfToken(),
-    });
-});
 
 module.exports = app;
