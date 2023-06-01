@@ -134,7 +134,9 @@ app.post("/users", async (request, response) => {
             return response.redirect("/userHomePage/n");
         });
     } catch (error) {
-        return response.send("Already exist");
+        console.log(error);
+        request.flash("error", "Email already in use!");
+        response.redirect("/signupPage");
     }
 });
 
