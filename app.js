@@ -1,42 +1,35 @@
 const express = require("express");
 const app = express();
-const csrf = require("tiny-csrf");
-const { Todo, User } = require("./models");
-const bodyPaser = require("body-parser");
-var cookieParser = require("cookie-parser");
-const passport = require('passport');
-const connectEnsureLogin = require('connect-ensure-login');
-const session = require('express-session');
-const LocalStrategy = require('passport-local');
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
-const flash = require("connect-flash");
+const { User, Sports, sessions, players } = require("./models");
+const bodyParser = require("body-parser");
 const path = require("path");
+const passport = require("passport");
+const connectEnsureLogin = require("connect-ensure-login");
+const session = require("express-session");
+const LocalStrategy = require("passport-local");
+var csurf = require("tiny-csrf");
+var cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt");
+const flash = require("connect-flash");
+
+const saltRounds = 10;
+
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
-app.set("views", path.join(__dirname, "views"));
+app.use(cookieParser("shh! some secret string"));
+app.use(csurf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 app.use(flash());
-
-module.exports = {
-    "**/*.js": ["eslint --fix", "prettier --write"],
-};
-
-app.use(bodyPaser.json());
-app.use(cookieParser("Somthing Went Wrong!!!"));
-app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
-//set EJS as view engine
-app.set("view engine", "ejs");
-app.use(express.static(path.join(__dirname, "public")));
-
-app.use(session({
-    secret: "my secret key 010903245678987654321",
-    cookie: {
-        maxAge: 24 * 60 * 60 * 1000
-    }
-}));
+app.use(
+    session({
+        secret: "my-super-secret-key-21728172615261562",
+        cookie: {
+            maxAge: 24 * 60 * 60 * 1000,
+        },
+    })
+);
 
 app.use(passport.initialize());
 app.use(passport.session());
-
 app.use((request, response, next) => {
     response.locals.messages = request.flash();
     next();
@@ -121,9 +114,7 @@ app.post("/users", async (request, response) => {
             email: request.body.email,
         },
     });
-    console.log("====================================");
     console.log(existingUser);
-    console.log("====================================");
     try {
         const user = await User.create({
             firstName: request.body.firstName,
@@ -195,10 +186,8 @@ app.get(
                 id: request.user.id,
             },
         });
-        console.log("====================================");
         console.log(request.user.id);
         console.log(getUserName.firstName);
-        console.log("====================================");
         const sportsItems = await Sports.findAll();
         if (request.accepts("html")) {
             response.render("userHomePage", {
@@ -278,9 +267,7 @@ app.get(
         const countOfSports = await Sports.count();
         const getSports = await Sports.findAll();
         const getSessions = await sessions.findAll();
-        console.log("====================================");
         console.log(countOfSports);
-        console.log("====================================");
         return response.render("viewReport", {
             "csrfToken": request.csrfToken(), //prettier-ignore
             countOfSports,
@@ -394,9 +381,7 @@ app.get(
                 id: request.user.id,
             },
         });
-        console.log("====================================");
         console.log(getPlayerName.firstName);
-        console.log("====================================");
         const totalPlayers = await sessions.findOne({
             where: {
                 id: request.params.sessionId,
@@ -479,9 +464,7 @@ app.get(
                 id: request.user.id,
             },
         });
-        console.log("====================================");
         console.log(getPlayerName.firstName);
-        console.log("====================================");
         const totalPlayers = await sessions.findOne({
             where: {
                 id: request.params.sessionId,
@@ -681,9 +664,7 @@ app.get(
             },
         });
         const getDate = new Date().toISOString();
-        console.log("====================================");
         console.log(request.user.id);
-        console.log("====================================");
         response.render("sessionDetailPage", {
             "csrfToken": request.csrfToken(),
             sessionSportName,
@@ -762,9 +743,7 @@ app.get(
         const idSport = await Sports.findByPk(request.params.id);
         const sportsItems = await Sports.findAll();
         try {
-            console.log("====================================");
             console.log(idSport.Sports_Name);
-            console.log("====================================");
             await sessions.destroy({
                 where: {
                     sportname: idSport.Sports_Name,
