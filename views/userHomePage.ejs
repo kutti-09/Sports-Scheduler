@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="<%= csrfToken %>" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/styles.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
+        crossorigin="anonymous"></script>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            color: white;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 250px);
+            align-items: center;
+            justify-content: center;
+            grid-gap: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background-color: var(--background-color);
+            box-shadow: 0px var(--card-box-shadow-1-y) var(--card-box-shadow-1-blur) var(--card-box-shadow-1),
+                0px var(--card-box-shadow-2-y) var(--card-box-shadow-2-blur) var(--card-box-shadow-2),
+                0 0 0 1px var(--card-border-color);
+            padding: 46px 10px 10px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            transition: box-shadow 0.25s;
+        }
+
+        .card .icon {
+            z-index: 2;
+            position: relative;
+            display: table;
+            padding: 8px;
+        }
+
+        body {
+            --background-color: #333339;
+            --text-color: #a1a1aa;
+            --card-background-color: rgba(255, 255, 255, 0.015);
+            --card-border-color: rgba(255, 255, 255, 0.1);
+            --card-box-shadow-1: rgba(58, 51, 51, 0.05);
+            --card-box-shadow-1-y: 3px;
+            --card-box-shadow-1-blur: 6px;
+            --card-box-shadow-2: rgba(59, 54, 54, 0.1);
+            --card-box-shadow-2-y: 8px;
+            --card-box-shadow-2-blur: 15px;
+            --card-label-color: #fff;
+            --card-icon-color: #d4d4d8;
+            --card-icon-background-color: rgba(255, 255, 255, 0.08);
+            --card-icon-border-color: rgba(255, 255, 255, 0.12);
+            --card-shine-opacity: 0.1;
+            --card-line-color: #2a2b2c;
+            --card-tile-color: rgba(185, 106, 16, 0.05);
+            --blur-opacity: 0.01;
+        }
+    </style>
+
+    <title>PLayer</title>
+</head>
+
+<body>
+    <div class="grid grid-cols-6">
+        <div class="col-start-3 col-span-2">
+            <%- include('header.ejs') %><br><br>
+                <h1 class="text-4xl font-semibold text-gray-900" style="text-align: center;">
+                    Hello <%= getUserName.firstName %>
+                </h1><br><br>
+        </div>
+    </div>
+    <h1 class="m-5" style="font-family: sans-serif; color: rgba(14, 15, 15, 0.819); font-size: 2.5vw;">
+        Available Sports
+    </h1>
+    <div class="grid">
+        <% sportsItems.forEach(function(user) { %>
+            <div class="card">
+                <h1 style="color: transparent; font-family: sans-serif;">
+                    <%= user.id %>
+                </h1>
+                <h1 style="color: rgba(238, 227, 240, 0.819); font-family: sans-serif; font-size: 2.2vw;"
+                    class="getSportId" id="getNameOfSport" onclick="window.location.href='/SportDetail'">
+                    <%= user.Sports_Name %>
+                </h1>
+            </div>
+            <% }); %>
+                <script>
+                    const redirectAnchors = document.querySelectorAll("h1.getSportId");
+                    redirectAnchors.forEach((anchor) => {
+                        anchor.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            const text = this.innerText;
+                            const url = "/Sports/n/" + encodeURIComponent(text);
+                            this.setAttribute("href", url);
+                            window.location.href = url;
+                        });
+                    });
+                </script>
+
+                <script>
+                    const anchors = document.querySelectorAll("a.link");
+                    anchors.forEach((anchor) => {
+                        anchor.addEventListener("click", function (event) {
+                            event.preventDefault();
+                            const text = this.innerText;
+                            const url = "/Sports/n/" + encodeURIComponent(text);
+                            this.setAttribute("href", url);
+                            window.location.href = url;
+                        });
+                    });
+                </script>
+    </div>
+    <div class="grid grid-cols-6">
+        <div class="col-start-1 col-span-2">
+            <div class="py-3">
+                <br>
+                <p class="text-2xl font-semibold text-gray-600">Would you like to sign out? <a href="/"
+                        class="text-green-600">Signout</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
