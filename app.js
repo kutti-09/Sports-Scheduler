@@ -1,68 +1,70 @@
 const express = require("express");
 const app = express();
-const { Todo, User, Sports, sessions, players } = require("./models");
-const bodyParser = require("body-parser");
-const path = require("path");
-const passport = require("passport");
-const connectEnsureLogin = require("connect-ensure-login");
-const session = require("express-session");
-const LocalStrategy = require("passport-local");
-var csurf = require("tiny-csrf");
+const csrf = require("tiny-csrf");
+const { Todo, User } = require("./models");
+const bodyPaser = require("body-parser");
 var cookieParser = require("cookie-parser");
-const bcrypt = require("bcrypt");
-const flash = require("connect-flash");
-
+const passport = require('passport');
+const connectEnsureLogin = require('connect-ensure-login');
+const session = require('express-session');
+const LocalStrategy = require('passport-local');
+const bcrypt = require('bcrypt');
 const saltRounds = 10;
-
-app.use(bodyParser.json());
+const flash = require("connect-flash");
+const path = require("path");
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser("shh! some secret string"));
-app.use(csurf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+app.set("views", path.join(__dirname, "views"));
 app.use(flash());
-app.use(
-    session({
-        secret: "my-super-secret-key-21728172615261562",
-        cookie: {
-            maxAge: 24 * 60 * 60 * 1000,
-        },
-    })
-);
+
+module.exports = {
+    "**/*.js": ["eslint --fix", "prettier --write"],
+};
+
+app.use(bodyPaser.json());
+app.use(cookieParser("Somthing Went Wrong!!!"));
+app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
+//set EJS as view engine
+app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use(session({
+    secret: "my secret key 010903245678987654321",
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000
+    }
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(function (request, response, next) {
+
+app.use((request, response, next) => {
     response.locals.messages = request.flash();
     next();
 });
 
-passport.use(
-    new LocalStrategy(
-        {
-            usernameField: "email",
-            passwordField: "password",
+passport.use(new LocalStrategy({
+    usernameField: "email",
+    passwordField: "password",
+}, (username, password, done) => {
+    User.findOne({
+        where: {
+            email: username,
         },
-        (username, password, done) => {
-            User.findOne({
-                where: {
-                    email: username,
-                },
-            })
-                .then(async (user) => {
-                    const result = await bcrypt.compare(password, user.password);
-                    if (result) {
-                        return done(null, user);
-                    } else {
-                        return done(null, false, { message: "Invalid Password" });
-                    }
-                })
-                .catch((error) => {
-                    return done(null, false, {
-                        message: "Account doesn't exist for this mail id",
-                    });
-                });
-        }
-    )
-);
+    })
+        .then(async (user) => {
+            const result = await bcrypt.compare(password, user.password);
+            if (result) {
+                return done(null, user);
+            } else {
+                return done(null, false, { message: "Invalid Password" });
+            }
+        })
+        .catch((error) => {
+            return done(null, false, {
+                message: "Account doesn't exist for this mail id",
+            });
+        });
+}));
 
 passport.serializeUser((user, done) => {
     console.log("Serializing user in session", user.id);
