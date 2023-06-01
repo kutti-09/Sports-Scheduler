@@ -821,7 +821,7 @@ app.get("/Sports/:name/NewSession", async (request, response) => {
 app.post(
     "/session",
     passport.authenticate("local", {
-        failureRedirect: "/login",
+        failureRedirect: "/loginPage",
         failureFlash: true,
     }),
     async (request, response) => {
