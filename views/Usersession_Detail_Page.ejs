@@ -489,7 +489,7 @@
                                             <div class="container formLogin shadow-lg" id="formSignupContainer">
                                                 <form action="/updateSession/n" method="post">
                                                     <h1 align="center" class="my-3"
-                                                        style="color: rgb(241, 157, 0); font-family: sans-serif">
+                                                        style="color: rgb(4, 4, 4); font-family: sans-serif">
                                                         Update Session
                                                     </h1>
                                                     <svg onclick="closeFormSignup()" style="
@@ -516,19 +516,23 @@
                                                     <hr />
                                                     <center>
                                                         <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                                                        <label class="my-3 text-dark">Date: </label>
                                                         <input type="date" name="session"
                                                             placeholder="Enter the session date" id=""
                                                             value="<%= getSessionDetail.session %>"
-                                                            class="loginInput p-3" required />
+                                                            class="loginInput p-3" required /><br>
+                                                        <label class="my-3 text-dark">Time: </label>
                                                         <input type="time" name="time" placeholder="time" id=""
                                                             class="loginInput p-3" value="<%= getSessionDetail.time %>"
-                                                            required />
+                                                            required /><br>
+                                                        <label class="my-3 text-dark">Address: </label>
                                                         <input type="text" name="Address"
                                                             placeholder="where the session will be held" id=""
                                                             class="loginInput p-3"
-                                                            value="<%= getSessionDetail.Address %>" required />
+                                                            value="<%= getSessionDetail.Address %>" required /><br>
+                                                        <label class="my-3 text-dark">Players: </label>
                                                         <input type="hidden" class="loginInput p-3"
-                                                            placeholder="who all are participating" name="userId" id=""
+                                                            placeholder="how many players you need" name="userId" id=""
                                                             value="<%= getSessionDetail.id%>" required />
                                                         <br />
                                                         <input type="number" placeholder="how many players do you need"
@@ -540,7 +544,7 @@
                                                             required /><label class="my-3 text-dark">I agree to update
                                                             this session</label><br />
                                                         <button type="submit" class="btn w-50" style="
-                  background-color: orange;
+                  background-color: rgb(41, 149, 19);
                   color: white;
                   font-weight: 600;
                   font-size: 1.7vw;
