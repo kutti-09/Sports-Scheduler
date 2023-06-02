@@ -689,7 +689,7 @@ app.get("/Sports/:name/sessionDetail/n/:id", connectEnsureLogin.ensureLoggedIn()
 
 app.get("/SportDetail", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
-        return response.render("Sport_Detail_Page2");
+        return response.render("sportDetailPage2");
     }
 );
 
