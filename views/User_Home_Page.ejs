@@ -15,6 +15,40 @@
         crossorigin="anonymous"></script>
 
     <style>
+        section {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        #home {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 1)),
+                url("https://img.freepik.com/free-photo/vivid-blurred-colorful-background_58702-2554.jpg?q=10&h=200");
+            background-size: cover;
+            background-position: center;
+            flex-direction: column;
+        }
+
+        .h1 {
+            font-family: brush script mt, cursive;
+            color: rgb(255, 255, 255);
+            font-size: 5.5vw;
+            text-align: center;
+        }
+
+        .h2 {
+            font-family: lucida handwriting, cursive;
+            color: rgb(255, 255, 255);
+            font-size: 2.0vw;
+            text-align: center;
+        }
+
+        .common {
+            font-family: arrial;
+            color: rgb(255, 255, 255);
+            font-size: 1.9vw;
+        }
+
         * {
             padding: 0;
             margin: 0;
@@ -64,64 +98,63 @@
 </head>
 
 <body>
-    <div class="grid grid-cols-6">
-        <div class="col-start-3 col-span-2">
-            <%- include('header.ejs') %><br><br>
-                <h1 class="text-4xl font-semibold text-gray-900" style="text-align: center; color:rgb(45, 45, 206)">
-                    Hello <%= getUserName.firstName %>
-                </h1><br><br>
-        </div>
-    </div>
-    <h1 class="m-5" style="font-family: sans-serif; color: rgba(53, 181, 181, 0.819); font-size: 2.5vw;">
-        Available Sports
-    </h1>
-    <div class="grid">
-        <% sportsItems.forEach(function(user) { %>
-            <div class="card">
-                <h1 style="color: transparent; font-family: sans-serif;">
-                    <%= user.id %>
-                </h1>
-                <h1 style="color: rgba(189, 111, 202, 0.819); font-family: sans-serif; font-size: 2.2vw;"
-                    class="getSportId" id="getNameOfSport" onclick="window.location.href='/SportDetail'">
-                    <%= user.Sports_Name %>
-                </h1>
-            </div>
-            <% }); %>
-                <script>
-                    const redirectAnchors = document.querySelectorAll("h1.getSportId");
-                    redirectAnchors.forEach((anchor) => {
-                        anchor.addEventListener("click", function (event) {
-                            event.preventDefault();
-                            const text = this.innerText;
-                            const url = "/Sports/n/" + encodeURIComponent(text);
-                            this.setAttribute("href", url);
-                            window.location.href = url;
+    <section id="home">
+        <h1 class="h1">
+            Sports Scheduler
+        </h1><br><br>
+        <h2 class="h2">
+            Hello <%= getUserName.firstName %>
+        </h2><br>
+        <h1 class="m-5" style="font-family: arrial; color: rgba(255, 255, 255, 0.819); font-size: 2.5vw;">
+            Available Sports
+        </h1>
+        <div class="grid">
+            <% sportsItems.forEach(function(user) { %>
+                <div class="card">
+                    <h1 style="color: transparent; font-family: sans-serif;">
+                        <%= user.id %>
+                    </h1>
+                    <h1 style="color: rgba(189, 111, 202, 0.819); font-family: sans-serif; font-size: 2.2vw;"
+                        class="getSportId" id="getNameOfSport" onclick="window.location.href='/SportDetail'">
+                        <%= user.Sports_Name %>
+                    </h1>
+                </div>
+                <% }); %>
+                    <script>
+                        const redirectAnchors = document.querySelectorAll("h1.getSportId");
+                        redirectAnchors.forEach((anchor) => {
+                            anchor.addEventListener("click", function (event) {
+                                event.preventDefault();
+                                const text = this.innerText;
+                                const url = "/Sports/n/" + encodeURIComponent(text);
+                                this.setAttribute("href", url);
+                                window.location.href = url;
+                            });
                         });
-                    });
-                </script>
+                    </script>
 
-                <script>
-                    const anchors = document.querySelectorAll("a.link");
-                    anchors.forEach((anchor) => {
-                        anchor.addEventListener("click", function (event) {
-                            event.preventDefault();
-                            const text = this.innerText;
-                            const url = "/Sports/n/" + encodeURIComponent(text);
-                            this.setAttribute("href", url);
-                            window.location.href = url;
+                    <script>
+                        const anchors = document.querySelectorAll("a.link");
+                        anchors.forEach((anchor) => {
+                            anchor.addEventListener("click", function (event) {
+                                event.preventDefault();
+                                const text = this.innerText;
+                                const url = "/Sports/n/" + encodeURIComponent(text);
+                                this.setAttribute("href", url);
+                                window.location.href = url;
+                            });
                         });
-                    });
-                </script>
-    </div>
-    <div class="grid grid-cols-6">
-        <div class="col-start-1 col-span-2">
-            <div class="py-3">
-                <br>
-                <p class="text-2xl font-semibold text-gray-600">Would you like to sign out? <a href="/"
-                        class="text-green-600">Signout</a></p>
+                    </script>
+        </div>
+        <div class="grid grid-cols-6">
+            <div class="col-start-1 col-span-2">
+                <div class="py-3">
+                    <br>
+                    <p class="common">Would you like to sign out? <a href="/" class="text-gray-600">Signout</a></p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 </body>
 
 </html>
