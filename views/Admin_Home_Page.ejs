@@ -122,6 +122,15 @@
                             type="submit">Create</button>
                     </div>
                 </form>
+                <div style="color:white" class="form">
+                    <% if(messages && messages.error && messages.error.length> 0) { %>
+                        <% for(var i=0; i<messages.error.length; i++) { %>
+                            <li>
+                                <%= messages.error[i] %>
+                            </li>
+                            <% } %>
+                                <% } %>
+                </div>
             </div>
         </div>
         <h1 class="m-5" style="font-family: arrial; color: rgba(252, 252, 252, 0.819); font-size: 3.0vw;">Available
