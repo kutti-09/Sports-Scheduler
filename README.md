@@ -1,8 +1,8 @@
 # Sports-Scheduler
 ## Sports schedule is a platform where a user can register him/her self to participate and schedule thier sessions. 
 ### This website serves for both players and administrators. Admins can login the admin credentials 
-Email ID: _administrator@gmail.com_
-Password: _admin9876_
+__Email ID:__ _administrator@gmail.com_    
+__Password:__ _admin9876_
 ![homepage](/screenshots/homepage.png)
 ## Home Page
 ### **There is even a _signup_ option for the new users**
