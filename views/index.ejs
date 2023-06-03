@@ -9,17 +9,99 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="./css/styles.css" rel="stylesheet">
     <title>Sports Scheduler</title>
+    <style>
+        section {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .h1 {
+            font-family: brush script mt, cursive;
+            color: rgba(87, 2, 167, 0.77);
+            font-size: 5.5vw;
+            text-align: center;
+        }
+
+        .h2 {
+            font-family: lucida handwriting, cursive;
+            color: rgb(246, 245, 241);
+            font-size: 3.0vw;
+            text-align: center;
+        }
+
+        .h3 {
+            font-size: lucida handwriting, cursive;
+            color: rgb(253, 253, 255);
+            font-size: 2.0vw;
+            text-align: center;
+        }
+
+        .split {
+            height: 100%;
+            width: 50%;
+            position: fixed;
+            z-index: 1;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            right: 0;
+        }
+
+        .para {
+            font-family: arrial;
+            color: rgb(255, 255, 255);
+            font-size: 2.0vw;
+        }
+
+        .centered {
+            position: absolute;
+            top: 60%;
+            left: 30%;
+            transform: translate(-30%, -50%);
+            text-align: center;
+        }
+
+        #home {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 1)),
+                url("./main.jpg");
+            background-size: cover;
+            background-position: center;
+            flex-direction: column;
+
+        }
+    </style>
 </head>
 
 <body>
-    <div class="grid grid-cols-6">
-        <div class="col-start-3 col-span-2">
-            <%- include('header.ejs') %>
-                <p class="py-2">Welcome to the Sports Scheduler</p>
-                <p class="py-2">New here? <a href="/Signup_Page" class="text-green-600">Sign-up now</a></p>
-                <p class="py-2">Already have an account? <a href="/Login_Page" class="text-green-600">Sign-in</a></p>
+    <section id="home">
+        <h1 class="h1">
+            Sports Scheduler
+        </h1>
+        <h2 class="h2">Welcome to the Sports Scheduler</h2><br><br>
+        <div class="split left">
+            <div class="centered">
+                <p class="para">This website pages a crucial role in simplifying the process of creating and managing
+                    the
+                    sports, where players can join sport and schedule their sessions.
+                    Moreover, helping to maintain the integrety and excitment in sports.
+                </p>
+            </div>
         </div>
-    </div>
+        <div class="split right">
+            <div class="centered">
+                <h3 class="para">New here? <a href="/Signup_Page" style="color:rgb(247, 152, 9)">Sign-up now</a></h3>
+                <h3 class="para">Already have an account? <a href="/Login_Page"
+                        style="color:rgb(248, 163, 6)">Sign-in</a></h3>
+            </div>
+        </div>
+    </section>
 </body>
 
 </html>
