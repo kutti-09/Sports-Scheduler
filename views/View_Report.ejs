@@ -15,6 +15,40 @@
         crossorigin="anonymous"></script>
 
     <style>
+        section {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        #home {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 1)),
+                url("./report.jpg");
+            background-size: cover;
+            background-position: center;
+            flex-direction: column;
+        }
+
+        .h1 {
+            font-family: brush script mt, cursive;
+            color: rgb(245, 251, 247);
+            font-size: 5.5vw;
+            text-align: center;
+        }
+
+        .h2 {
+            font-family: lucida handwriting, cursive;
+            color: rgb(5, 5, 5);
+            font-size: 2.0vw;
+            text-align: center;
+        }
+
+        .common {
+            font-family: arrial;
+            color: rgb(243, 172, 7);
+            font-size: 1.9vw;
+        }
+
         * {
             padding: 0;
             margin: 0;
@@ -38,70 +72,66 @@
 </head>
 
 <body>
-    <div class="grid grid-cols-6">
-        <div class="col-start-3 col-span-2">
-            <%- include('header.ejs') %><br><br>
-                <h1 class="text-4xl font-semibold text-gray-600" style="text-align: center;">
-                    Reports
-                </h1>
+    <section id="home">
+        <h1 class="h1">
+            Sports Scheduler
+        </h1><br><br>
+        <h2 class="h2">
+            Welcome Admin
+        </h2><br>
+        <div class="container-fluid">
+            <h1 class="common">
+                Available Sports
+                <% getSports.forEach(function(user) { %>
+                    <p class="text-gray-900" style="color: rgba(255, 253, 253, 0.785)">
+                        <%= user.Sports_Name %>
+                    </p>
+                    <% } ) %>
+            </h1>
         </div>
-    </div>
-    <div class="container-fluid">
-        <h1 class="text-2xl font-semibold text-gray-600">
-            Available Sports
-            <span style="background-color: green; border-radius: 12px" class="px-3">
-                <%= countOfSports%>
-            </span>
-            <% getSports.forEach(function(user) { %>
-                <p class="text-gray-900" style="color: rgba(66, 62, 62, 0.785)">
-                    <%= user.Sports_Name %>
-                </p>
-                <% } ) %>
-        </h1>
-    </div>
-    <div class="container-fluid sessions my-5">
-        <h1 class="text-2xl font-semibold text-gray-600">Sessions</h1>
-        <div class="flex mx-3" style="display: flex">
-            <% getSessions.forEach(function(user) { %>
-                <div class="card mx-3" style="width: 18rem">
-                    <div class="card-body">
-                        <h4 class="card-title">
-                            <%= user.sportname%>
-                        </h4>
-                        <p class="card-text text-dark">
-                            Session id: <span class="text-gray-900">
-                                <%= user.id%>
-                            </span>
-                        </p>
-                        <p class="card-text text-dark">
-                            Session date: <span class="text-gray-900">
-                                <%= user.session%>
-                            </span>
-                        </p>
-                        <p class="card-text text-dark">
-                            Session address:
-                            <span class="text-gray-900">
-                                <%= user.Address%>
-                            </span>
-                        </p>
-                        <p class="card-text text-dark">
-                            Total players:
-                            <span class="text-gray-900">
-                                <%= user.countOfPlayers%>
-                            </span>
-                        </p>
-                        <p class="card-text text-dark">
-                            Date of creation:
-                            <span class="text-gray-900">
-                                <%= user.createdAt%>
-                            </span>
-                        </p>
+        <div class="container-fluid sessions my-5">
+            <h1 class="common">Sessions</h1>
+            <div class="flex mx-1" style="display: flex;color: white;">
+                <% getSessions.forEach(function(user) { %>
+                    <div class="card mx-1" style="width: 18rem">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                <%= user.sportname%>
+                            </h4>
+                            <p class="card-text text-dark">
+                                Session id: <span class="text-gray-900">
+                                    <%= user.id%>
+                                </span>
+                            </p>
+                            <p class="card-text text-dark">
+                                Session date: <span class="text-gray-900">
+                                    <%= user.session%>
+                                </span>
+                            </p>
+                            <p class="card-text text-dark">
+                                Session address:
+                                <span class="text-gray-900">
+                                    <%= user.Address%>
+                                </span>
+                            </p>
+                            <p class="card-text text-dark">
+                                Total players:
+                                <span class="text-gray-900">
+                                    <%= user.countOfPlayers%>
+                                </span>
+                            </p>
+                            <p class="card-text text-dark">
+                                Date of creation:
+                                <span class="text-gray-900">
+                                    <%= user.createdAt%>
+                                </span>
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <% } ) %>
+                    <% } ) %>
+            </div>
         </div>
-    </div>
-    <button class="btn btn-danger" style="
+        <button class="btn btn-danger" style="
           width: 8%;
           margin: 15px;
           border-radius: 32px;
@@ -111,22 +141,23 @@
           letter-spacing: 2px;
           font-size: 1.3vw;
         " onclick="window.location.href='/admin'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="26" fill="white" class="bi bi-arrow-left"
-            viewBox="0 0 16 16" style="margin: 4px">
-            <path fill-rule="evenodd"
-                d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
-        </svg>
-        Back
-    </button>
-    <div class="grid grid-cols-6">
-        <div class="col-start-1 col-span-2">
-            <div class="py-3">
-                <p class="text-2xl font-semibold text-gray-600">Would you like to sign out? <a href="/"
-                        class="text-green-600">Signout</a></p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="26" fill="white" class="bi bi-arrow-left"
+                viewBox="0 0 16 16" style="margin: 4px">
+                <path fill-rule="evenodd"
+                    d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z" />
+            </svg>
+            Back
+        </button>
+        <div class="grid grid-cols-6">
+            <div class="col-start-1 col-span-2">
+                <div class="common">
+                    <p class="text-2xl font-semibold text-gray-600" style="color:white">Would you like to sign out? <a
+                            href="/" class="text-gray-600">Signout</a></p>
 
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 </body>
 
 </html>
