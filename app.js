@@ -222,7 +222,7 @@ app.post("/newsport", async (request, response) => {
         where: { Sports_Name: inputFieldNewSport },
     });
     if (existingSport) {
-        response.send("Already Exist in the database");
+        request.flash("error","Already Exist in the database");
     } else {
         try {
             const inputData = await Sports.create({
