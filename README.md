@@ -3,8 +3,8 @@
 /assets/images/homepage.png
 ## Home Page
 This website serves for both players and administrators. Admins can login the admin credentials 
-**Email ID: **_administrator@gmail.com_
-**Password: **_admin9876_
+Email ID: _administrator@gmail.com_
+Password: _admin9876_
 /assets/images/loginpage.png
 ## Logini Page
 **There is even a _signup_ option for the new users**
@@ -18,4 +18,4 @@ This website serves for both players and administrators. Admins can login the ad
 ## Sport Sessions page
 ### Players have the option of joining already-running sessions or starting their own. When a player creates a session, they have the option to add or remove players.
 
-**Live URL ** [Sports Scheduler](https://sports-scheduler-archana.onrender.com)
+Live URL [Sports Scheduler](https://sports-scheduler-archana.onrender.com)
