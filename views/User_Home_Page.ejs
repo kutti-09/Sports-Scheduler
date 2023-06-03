@@ -38,8 +38,8 @@
 
         .h2 {
             font-family: lucida handwriting, cursive;
-            color: rgb(255, 255, 255);
-            font-size: 2.0vw;
+            color: rgb(100, 214, 23);
+            font-size: 2.5vw;
             text-align: center;
         }
 
@@ -105,16 +105,16 @@
         <h2 class="h2">
             Hello <%= getUserName.firstName %>
         </h2><br>
-        <h1 class="m-5" style="font-family: arrial; color: rgba(255, 255, 255, 0.819); font-size: 2.5vw;">
+        <h1 class="m-5" style="font-family: arrial; color: rgba(29, 224, 191, 0.819); font-size: 2.5vw;">
             Available Sports
         </h1>
         <div class="grid">
             <% sportsItems.forEach(function(user) { %>
-                <div class="card">
+                <div>
                     <h1 style="color: transparent; font-family: sans-serif;">
                         <%= user.id %>
                     </h1>
-                    <h1 style="color: rgba(189, 111, 202, 0.819); font-family: sans-serif; font-size: 2.2vw;"
+                    <h1 style="color: rgba(252, 252, 252, 0.819); font-family: sans-serif; font-size: 2.2vw;"
                         class="getSportId" id="getNameOfSport" onclick="window.location.href='/SportDetail'">
                         <%= user.Sports_Name %>
                     </h1>
@@ -146,6 +146,9 @@
                         });
                     </script>
         </div>
+        <br>
+        <br>
+        <p class="common" style="color:rgb(220, 189, 17)">Create a session by selecting your preferred sport.</p>
         <div class="grid grid-cols-6">
             <div class="col-start-1 col-span-2">
                 <div class="py-3">
