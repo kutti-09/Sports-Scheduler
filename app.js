@@ -223,6 +223,7 @@ app.post("/newsport", async (request, response) => {
     });
     if (existingSport) {
         request.flash("error","Already Exist in the database");
+        return response.redirect("/admin");
     } else {
         try {
             const inputData = await Sports.create({
