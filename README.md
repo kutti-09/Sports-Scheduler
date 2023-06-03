@@ -1,6 +1,6 @@
 # Sports-Scheduler
 ## Sports schedule is a platform where a user can register him/her self to participate and schedule thier sessions. 
-![Screenshot of a comment on a GitHub issue showing an image, added in the Markdown, of an Octocat smiling and raising a tentacle.](/images/homepage.png)
+../blob/main/assets/images/electrocat.png?raw=true
 ## Home Page
 This website serves for both players and administrators. Admins can login the admin credentials 
 Email ID: _administrator@gmail.com_
