@@ -11,55 +11,100 @@
     <title>
         <%= title %>
     </title>
+    <style>
+        section {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        #home {
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 1)),
+                url("https://media.istockphoto.com/id/1388948315/photo/abstract-colorful-background-brush-strokes-red-orange-yellow-purple-and-blue-colors-artistic.jpg?s=170667a&w=0&k=20&c=89Y50c4JceRxibl8cmN2v998Ido5xKbTB6iOtATaRdw=");
+            background-size: cover;
+            background-position: center;
+            flex-direction: column;
+        }
+
+        .h1 {
+            font-family: brush script mt, cursive;
+            color: rgb(255, 255, 255);
+            font-size: 5.5vw;
+            text-align: center;
+        }
+
+        .h2 {
+            font-family: lucida handwriting, cursive;
+            color: rgb(255, 255, 255);
+            font-size: 2.0vw;
+            text-align: center;
+        }
+
+        .form {
+            font-family: arrial;
+            color: rgb(255, 255, 255);
+            font-size: 1.1vw;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="grid grid-cols-6">
-        <div class="col-start-3 col-span-2">
-            <h1 class="text-2x text-gray-600"
-                style="font-family: sans-serif; color: rgba(21, 21, 20, 0.819); font-size: 3.5vw;">
-                Welcome to Sports-Scheduler</h1>
-            <h6 class="py-4">Signup as a new user</h6>
-            <form action="/users" method="post">
-                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                <div class="py-3">
-                    <label for="firstName">First name:</label>
-                    <input type="text" name="firstName" class="border border-gray-300 text-gray-900 rounded p-2 w-full">
-                </div>
-                <div class="py-3">
-                    <label for="lastName">Last name:</label>
-                    <input type="text" name="lastName" class="border border-gray-300 text-gray-900 rounded p-2 w-full">
-                </div>
-                <div class="py-3">
-                    <label for="email">Email ID:</label>
-                    <input type="email" name="email" class="border border-gray-300 text-gray-900 rounded p-2 w-full">
-                </div>
-                <div class="py-3">
-                    <label for="password">Password:</label>
-                    <input type="password" name="password"
-                        class="border border-gray-300 text-gray-900 rounded p-2 w-full">
-                </div>
-                <div class="py-3">
-                    <button type="Submit"
-                        class="text-white bg-green-600 hover:bg-green-800 font-medium rounded px-5 py-2">Sign
-                        up</button>
-                </div>
-                <div class="py-3">
-                    <p class="py-2">Already have an account? <a href="/Login_Page" class="text-green-600">Sign-in</a>
-                    </p>
-                </div>
-            </form>
-            <div>
-                <% if(messages && messages.error && messages.error.length> 0) { %>
-                    <% for(var i=0; i<messages.error.length; i++) { %>
-                        <li>
-                            <%= messages.error[i] %><br>
-                        </li>
-                        <% } %>
+    <section id="home">
+        <h1 class="h1">
+            Sports Scheduler
+        </h1><br><br>
+        <h2 class="h2">Signup as a new user</h2><br>
+        <div class="grid grid-cols-8">
+            <div class="col-start-4 col-span-2">
+                <form action="/users" method="post">
+                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                    <div class="form">
+                        <label for="firstName">First name:</label>
+                        <input type="text" name="firstName"
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full"
+                            placeholder="Enter First Name">
+                    </div>
+                    <div class="form">
+                        <br><label for="lastName">Last name:</label>
+                        <input type="text" name="lastName"
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full"
+                            placeholder="Enter Last Name">
+                    </div>
+                    <div class="form">
+                        <br><label for="email">Email ID:</label>
+                        <input type="email" name="email" class="border border-gray-300 text-gray-900 rounded p-2 w-full"
+                            placeholder="Enter Email-Id">
+                    </div>
+                    <div class="form">
+                        <br><label for="password">Password:</label>
+                        <input type="password" name="password"
+                            class="border border-gray-300 text-gray-900 rounded p-2 w-full"
+                            placeholder="Enter password">
+                    </div>
+                    <div class="py-3">
+                        <br><button type="submit" class="bg-white hover:bg-green-800 font-medium rounded px-5 py-2"
+                            style="color: rgb(255, 196, 0)">Sign
+                            up</button>
+                    </div>
+                    <div class="form">
+                        <br>
+                        <p class="py-2" style="color:white">Already have an account? <a href="/Login_Page"
+                                style="color: rgb(255, 183, 0);">Sign-in</a>
+                        </p>
+                    </div>
+                </form>
+                <div style="color:white" class="form">
+                    <% if(messages && messages.error && messages.error.length> 0) { %>
+                        <% for(var i=0; i<messages.error.length; i++) { %>
+                            <li>
+                                <%= messages.error[i] %><br>
+                            </li>
                             <% } %>
+                                <% } %>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 </body>
 
 </html>
