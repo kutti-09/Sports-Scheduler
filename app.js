@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const passport = require("passport");
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "images")));
 app.set("view engine", "ejs");
 const connectEnsureLogin = require("connect-ensure-login");
 const session = require("express-session");
@@ -112,23 +113,27 @@ app.post("/users", async (request, response) => {
         },
     });
     console.log(existingUser);
-    try {
-        const user = await User.create({
-            firstName: request.body.firstName,
-            lastName: request.body.lastName,
-            email: request.body.email,
-            password: hashedPwd,
-        });
-        request.login(user, (err) => {
-            if (err) {
-                console.log(error);
-            }
-            return response.redirect("/User_Home_Page/n");
-        });
-    } catch (error) {
-        console.log(error);
+    if (existingUser) {
         request.flash("error", "Email already in use!");
         response.redirect("/Signup_Page");
+    }
+    else {
+        try {
+            const user = await User.create({
+                firstName: request.body.firstName,
+                lastName: request.body.lastName,
+                email: request.body.email,
+                password: hashedPwd,
+            });
+            request.login(user, (err) => {
+                if (err) {
+                    console.log(error);
+                }
+                return response.redirect("/User_Home_Page/n");
+            });
+        } catch (error) {
+            console.log(error);
+        }
     }
 });
 
