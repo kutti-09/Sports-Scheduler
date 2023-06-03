@@ -70,6 +70,18 @@
             z-index: 1;
         }
 
+        .sportsButtons {
+            width: 40%;
+            height: 5vh;
+            font-size: 1vw;
+            font-family: sans-serif;
+            border-radius: 32px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 1px 1px 10px 2px rgb(99, 99, 99);
+            margin: 5px;
+        }
+
         .card {
             background-color: var(--background-color);
             box-shadow: 0px var(--card-box-shadow-1-y) var(--card-box-shadow-1-blur) var(--card-box-shadow-1),
@@ -138,27 +150,19 @@
         </h1>
         <div class="grid">
             <% sportsItems.forEach(function(user) { %>
-                <div class="card">
-                    <h1 style="color: transparent; font-family: sans-serif;">
+                <div>
+                    <h1 style="color: transparent; font-family: sans-serif;" class="idofSport">
                         <%= user.id %>
                     </h1>
-                    <h1 style="color: rgba(250, 249, 249, 0.819); font-family: arrial; font-size: 2.0vw;"
+                    <h1 style="color: rgba(250, 249, 249, 0.819); font-family: arrial; font-size: 2.5vw;"
                         class="getSportId" id="getNameOfSport" onclick="window.location.href='/SportDetail'">
                         <%= user.Sports_Name %>
                     </h1>
-                    <div class="row">
-                        <div class="col-lg-12 my-5 sportsButtonsDiv">
-                            <a class="sportsButtons btn btn-danger deleteSport" href=''
-                                style="color: transparent; padding-left: 22px;"><svg xmlns="http://www.w3.org/2000/svg"
-                                    width="26" height="26" fill="currentColor" class="bi bi-trash3-fill"
-                                    viewBox="0 0 16 16">
-                                    <path
-                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z" />
-                                </svg>
-                                <%= user.id %>
-                            </a>
-                        </div>
-                    </div>
+                    <a class="sportsButtons btn btn-danger deleteSport" href=''
+                        style="color: transparent; padding-left: 22px;">
+                        <button class="text-white" onclick="">Delete</button>
+                        <%= user.id %>
+                    </a>
                 </div>
 
                 <% }); %>
@@ -180,8 +184,10 @@
                             anchor.addEventListener("click", function (event) {
                                 event.preventDefault();
                                 const text = this.innerText;
+                                const num = text.match(/\d+/g) || [];
+                                const id = num[0];
                                 window.alert(text)
-                                const url = "/delete/" + encodeURIComponent(text);
+                                const url = "/delete/" + encodeURIComponent(id);
                                 this.setAttribute("href", url);
                                 window.location.href = url;
                             });
