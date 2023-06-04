@@ -18,5 +18,5 @@ __Password:__ _admin9876_
 ![createsession](/screenshots/createsession.png)
 ## Sport Sessions page
 
-Live URL [Sports Scheduler](https://sports-scheduler-archana.onrender.com)
-Video URL [Demo Video](https://drive.google.com/file/d/1xTg_q3cnTAt-BVHEUIJsa-1RyAux4WJ4/view?usp=drivesdk)
+__Live URL__ [Sports Scheduler](https://sports-scheduler-archana.onrender.com)
+__Video URL__ [Demo Video](https://drive.google.com/file/d/1xTg_q3cnTAt-BVHEUIJsa-1RyAux4WJ4/view?usp=drivesdk)
