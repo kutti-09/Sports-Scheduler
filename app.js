@@ -222,7 +222,7 @@ app.post("/newsport", async (request, response) => {
         where: { Sports_Name: inputFieldNewSport },
     });
     if (existingSport) {
-        request.flash("error","Sport already exist!");
+        request.flash("error", "Already Exist in the database");
         return response.redirect("/admin");
     } else {
         try {
