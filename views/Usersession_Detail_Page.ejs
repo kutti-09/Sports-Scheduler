@@ -231,7 +231,8 @@
                 anchor.addEventListener("click", function (event) {
                     event.preventDefault();
                     const text = document.querySelector("span.nameOfSport").innerText;
-                    const url = "/Sports/n/" + encodeURIComponent(text);
+                    const encodedText = encodeURIComponent(text).replace(/%20/g, ' ');
+                    const url = "/Sports/n/" + encodedText;
                     this.setAttribute("onclick", `window.location.href='${url}'`);
                     window.location.href = url;
                 });
