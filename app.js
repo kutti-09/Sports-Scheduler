@@ -435,7 +435,7 @@ app.get("/Sports/:name/NewSession", async (request, response) => {
 app.get("/Sports/:name/deleteSession/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const deleteSessionId = request.params.id;
-        const nameofSport = request.params.name;
+        const nameofSport = decodeURIComponent(request.params.name);
 
         const deletePlayer = await sessions.destroy({
             where: {
@@ -456,7 +456,7 @@ app.get("/Sports/:name/deleteSession/:id", connectEnsureLogin.ensureLoggedIn(),
 app.get("/Sports/:name/deleteSession/n/:id", connectEnsureLogin.ensureLoggedIn(),
     async (request, response) => {
         const deleteSessionId = request.params.id;
-        const nameofSport = request.params.name;
+        const nameofSport = decodeURIComponent(request.params.name);
 
         const deletePlayer = await sessions.destroy({
             where: {
