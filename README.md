@@ -7,7 +7,7 @@ __Password:__ _admin9876_
 ## Home Page
 ### **There is even a _signup_ option for the new users**
 ![loginpage](/screenshots/loginpage.png)
-## Logini Page
+## Login Page
 ### For each sport, the administrator can design a sport and sessions. Administrators have full access to delete or alter any sport, as well as any player-created sessions.Administrators have access to reports that detail the sports that are accessible as well as scheduled and past sessions.
 ![adminhomepage](/screenshots/adminhomepage.png)
 ## Admin Home Page
